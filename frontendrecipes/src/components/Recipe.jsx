@@ -2,27 +2,62 @@ import React from "react";
 import "../styles/Recipe.css";
 import { useState } from "react";
 
-function Recipe({ recipe, onDelete, onChange }) {
+function Recipe({ recipe, onDelete, onChange, ingredientsList }) {
   const [updating, setUpdating] = useState(false);
-  const [ingredients, setIngredients] = useState(recipe.ingredients);
+  const [selectedIngredients, setSelectedIngredients] = useState(
+    recipe.ingredients
+  );
+  const [instructions, setInstructions] = useState(recipe.instructions);
   const [difficulty, setDifficulty] = useState(recipe.difficulty);
   const formattedDate = new Date(recipe.date_published).toLocaleDateString(
     "en-GB"
   );
+  const toggleIngredientSelection = (id) => {
+    setSelectedIngredients((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleUpdate = () => {
+    const ingredientIds = selectedIngredients.filter(
+      (ing) => typeof ing === "number"
+    );
+    onChange(recipe.id, difficulty, ingredientIds, instructions);
+    setUpdating(false);
+  };
 
   return (
     <div className="recipe-container">
       <p className="recipe-title">{recipe.title}</p>
       {updating ? (
         <textarea
-          id="ingredients"
-          name="ingredients"
+          id="instructions"
+          name="instructions"
           required
-          onChange={(e) => setIngredients(e.target.value)}
-          value={ingredients}
+          onChange={(e) => setInstructions(e.target.value)}
+          value={instructions}
         ></textarea>
       ) : (
-        <p className="recipe-ingredients">{recipe.ingredients}</p>
+        <p className="recipe-ingredients">{recipe.instructions}</p>
+      )}
+      {updating ? (
+        <div className="ingredients-checkboxes">
+          {ingredientsList.map((ing) => (
+            <label key={ing.id} className="ingredient-checkbox">
+              <input
+                type="checkbox"
+                value={ing.id}
+                checked={selectedIngredients.includes(ing.id)}
+                onChange={() => toggleIngredientSelection(ing.id)}
+              />
+              {ing.name} ({ing.category})
+            </label>
+          ))}
+        </div>
+      ) : (
+        <p className="recipe-ingredients">
+          {recipe.ingredients.map((ing) => ing.name).join(", ")}
+        </p>
       )}
       {updating && <br />}
       {updating ? (
@@ -45,13 +80,7 @@ function Recipe({ recipe, onDelete, onChange }) {
         Delete Recipe
       </button>
       {updating ? (
-        <button
-          className="update-button"
-          onClick={() => {
-            onChange(recipe.id, difficulty, ingredients);
-            setUpdating(false);
-          }}
-        >
+        <button className="update-button" onClick={handleUpdate}>
           Submit update
         </button>
       ) : (
