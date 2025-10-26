@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Recipe(models.Model):
-    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
     difficulty = models.PositiveIntegerField(
         validators=[
             MinValueValidator(1),

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
-        fields = ["id", "name", "difficulty", "ingredients", "date_published", "author"]
+        fields = ["id", "title", "difficulty", "ingredients", "date_published", "author"]
         extra_kwargs = {"author": {"read_only": True}}
 
 
